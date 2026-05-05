@@ -1,0 +1,87 @@
+name: ${APP_NAME_HOST}
+
+networks:
+  internal:
+    name: ${APP_NAME_HOST}_internal
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+volumes:
+  habitat-config:
+  influxdb-data:
+  influxdb-plugins:
+  influxdb-provisioning:
+
+
+secrets:
+  INFLUXDB_ADMIN_TOKEN_JSON:
+    file: ${SECRETS_DIR}/INFLUXDB_ADMIN_TOKEN_JSON
+  INFLUXDB_ADMIN_TOKEN:
+    file: ${SECRETS_DIR}/INFLUXDB_ADMIN_TOKEN
+
+services:
+
+  habitat-config-hoard:
+    image: tschebbischeff/habitat-config:latest
+    container_name: ${APP_NAME_HOST}_habitat-config-hoard
+    restart: no
+    env_file:
+      - ./.env
+      - path: ${ENV_DIR}/.env
+        required: false
+      - path: ${ENV_DIR}/habitat-config.env
+        required: false
+    environment:
+      MODULE_NAME: "hoard"
+    networks:
+      internal:
+    volumes:
+      - habitat-config:/habitat-config/orchestration
+      - ./habitat-config:/habitat-config/source:ro
+      - influxdb-provisioning:/habitat-config/target/influxdb
+
+  influxdb:
+    image: influxdb:3-core
+    container_name: ${APP_NAME_HOST}_influxdb
+    restart: always
+    expose:
+      - "8181"
+    user: "root"
+    env_file:
+      - ./.env
+      - path: ${ENV_DIR}/.env
+        required: false
+      - path: ${ENV_DIR}/influxdb.env
+        required: false
+    environment:
+      # https://docs.influxdata.com/influxdb3/core/reference/config-options/
+      INFLUXDB3_NODE_IDENTIFIER_PREFIX: "node0"
+      INFLUXDB3_OBJECT_STORE: "file"
+      INFLUXDB3_DB_DIR: "/var/lib/influxdb3/data"
+      INFLUXDB3_PLUGIN_DIR: "/var/lib/influxdb3/plugins"
+      INFLUXDB3_PROVISIONING_DIR: "/var/lib/influxdb3/provisioning"
+      INFLUXDB3_LOG_FILTER: "info"
+      INFLUXDB3_NUM_IO_THREADS: "2"
+      INFLUXDB3_NUM_DATAFUSION_THREADS: "2"
+      INFLUXDB3_ADMIN_TOKEN_FILE: "/run/secrets/INFLUXDB_ADMIN_TOKEN_JSON" # [ ! -d "./influxdb3-admin-token" ] && mkdir -p ./influxdb3-admin-token && { docker run --user "$(id -u):$(id -g)" --rm -v "./influxdb3-admin-token:/admin-token" influxdb:3-core influxdb3 create token --admin --name "admin-token" --offline --output-file /admin-token/admin-token.json >/dev/null; [ ! -f "./influxdb3-admin-token/admin-token.json" ] || cat "./influxdb3-admin-token/admin-token.json"; } && rm -rf ./influxdb3-admin-token
+      INFLUXDB3_DISABLE_AUTHZ: "health"
+    secrets:
+      - INFLUXDB_ADMIN_TOKEN_JSON
+      - INFLUXDB_ADMIN_TOKEN
+    volumes:
+      - influxdb-data:/var/lib/influxdb3/data
+      - influxdb-plugins:/var/lib/influxdb3/plugins
+      - influxdb-provisioning:/var/lib/influxdb3/provisioning
+    networks:
+      internal:
+    healthcheck:
+      test: [ "CMD", "curl", "-sfo", "/dev/null", "http://127.0.0.1:8181/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      habitat-config-hoard:
+        condition: service_completed_successfully
