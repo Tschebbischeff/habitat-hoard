@@ -45,7 +45,7 @@ services:
   influxdb:
     image: influxdb:3-core
     container_name: ${APP_NAME_HOST}_influxdb
-    restart: always
+    restart: unless-stopped
     expose:
       - "8181"
     user: "root"
