@@ -18,7 +18,7 @@ You can check out all officially available modules [here](https://github.com/Tsc
 
 ## Module Features
 
-[![InfluxDB 3 Core](https://img.shields.io/badge/InfluxDB_3_Core-_?style=flat&logo=influxdb&logoColor=22ADF6&logoSize=auto&color=gray&labelColor=gray)](https://www.influxdata.com/products/influxdb/)
+[![InfluxDB 3 Core](https://img.shields.io/badge/InfluxDB_3_Core-_?style=flat&logo=influxdb&logoColor=22ADF6&color=gray&labelColor=gray)](https://www.influxdata.com/products/influxdb/)
 
  - **Database Storage** \
  Persistent data storage for other modules.
