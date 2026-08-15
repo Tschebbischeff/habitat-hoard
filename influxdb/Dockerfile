@@ -11,6 +11,6 @@ COPY ./entrypoint-hook.sh /entrypoint-hook.sh
 RUN chmod +x /entrypoint-hook.sh
 
 ENTRYPOINT ["/entrypoint-hook.sh"]
-CMD ["/usr/bin/entrypoint.sh", "influxdb", "serve"]
+CMD ["/usr/bin/entrypoint.sh", "influxdb3", "serve"]
 
 USER influxdb
