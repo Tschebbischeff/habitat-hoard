@@ -17,4 +17,14 @@
 #     echo "No auth token or no provisioning directory."
 # fi
 
+[ -z "$UID" ] && UID="0"
+
+tmpCronFile="$(mktemp)"
+crontab -u "${UID}" -l 2>/dev/null | grep -v '/backup\.sh$' >"$tmpCronFile"
+echo "${INFLUXDB_BACKUP_SCHEDULE} /backup.sh" >>"$tmpCronFile"
+crontab -u "${UID}" "$tmpCronFile" || exit 1
+rm "$tmpCronFile"
+
+cron
+
 exec "$@"
