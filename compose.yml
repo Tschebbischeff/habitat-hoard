@@ -43,7 +43,8 @@ services:
       - influxdb-provisioning:/habitat-config/target/influxdb
 
   influxdb:
-    image: influxdb:3-core
+    build:
+      context: ./influxdb
     container_name: ${APP_NAME_HOST}_influxdb
     restart: unless-stopped
     expose:
