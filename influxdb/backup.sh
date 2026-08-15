@@ -21,6 +21,7 @@ echo "Starting backup of '$BASE_PATH' to '$BACKUP_DIR'..."
 backupTargets=(snapshots dbs wal catalog snapshot-checkpoints _catalog_checkpoint)
 for item in "${backupTargets[@]}"; do
     if [ -e "$BASE_PATH/$item" ]; then
+        echo "Copying '$item'..."
         cp -ra "$BASE_PATH/$item" "$BACKUP_DIR/"
         exitCode="$?"; [ "$exitCode" -ne "0" ] && backupFailed "$item" "$exitCode"
     fi
