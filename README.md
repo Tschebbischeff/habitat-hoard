@@ -103,6 +103,7 @@ SECRETS_DIR="/run/secrets"
 
 | Name | Description | Example | Default |
 | :-- | :-- | :-- | :-- |
+| `INFLUXDB_VERSION` | Tag for the [InfluxDB docker image](https://hub.docker.com/_/influxdb). | `3.10-core` | `3-core` |
 | `INFLUXDB_BACKUP_SCHEDULE` | A cron schedule in the form of `M H DoM MoY DoW`, determining when the InfluxDB `/data` directory is backed up to `/backup`. | `30 23 * * *` | `30 1 * * *` |
 | `INFLUXDB_BACKUP_RETENTION_DAYS` | The amount of time in days since an InfluxDB backup has been last modified until it is deleted. | `7` | `2` |
 
