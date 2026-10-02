@@ -1,5 +1,5 @@
 ARG INFLUXDB_VERSION
-FROM influxdb:${INFLUXDB_VERSION}
+FROM influxdb:${INFLUXDB_VERSION:?}
 USER root
 
 RUN apt update && apt install -y jq envsubst; rm -rf /var/lib/apt/lists/*
